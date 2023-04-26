@@ -16,7 +16,13 @@ public class PlayerActions : MonoBehaviour //this class controls the players act
     [SerializeField] private int inputReaderLength = 15; //how far back the inputs are held for special moves
     [SerializeField] private int inputBufferLength = 5; //how far before a player stops being busy that the inputs are read
 
-    
+    public Animator animator;
+
+    //HITBOXES
+    public GameObject attack5A;
+
+
+
     private void Awake()
     {
         inputHistory = new List<InputData>(); //new list of inputdata struct
@@ -35,12 +41,19 @@ public class PlayerActions : MonoBehaviour //this class controls the players act
             {
                 newVector = new Vector3(latestInput.movementVector.x * moveSpeed, 0, 0);
                 transform.position += newVector;
+                if (newVector.x != 0 || newVector.y != 0)
+                {
+                    animator.SetBool("isWalking", true);
+                } else
+                {
+                    animator.SetBool("isWalking", false);
+                }
             }
 
             //A BUTTON
             if (latestInput.AButtonPressed)
             {
-                
+
             }
             if (latestInput.AButtonHeld)
             {
@@ -87,5 +100,9 @@ public class PlayerActions : MonoBehaviour //this class controls the players act
     {
         inputHistory.Add(input); //add this struct to the input history
     }
+
+
+
+
 }
 
