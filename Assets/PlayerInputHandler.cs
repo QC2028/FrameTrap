@@ -24,6 +24,7 @@ public class PlayerInputHandler : MonoBehaviour //this class is instantiated as 
     {
         playerController.SetMoveVector(ctx.ReadValue<Vector2>());
     }
+
     public void OnAButton(InputAction.CallbackContext ctx)
     {
         if (ctx.started)
@@ -32,7 +33,7 @@ public class PlayerInputHandler : MonoBehaviour //this class is instantiated as 
         }
         if (ctx.canceled)
         {
-
+            playerController.AButtonRelease();
         }
         
     }
@@ -44,7 +45,7 @@ public class PlayerInputHandler : MonoBehaviour //this class is instantiated as 
         }
         if (ctx.canceled)
         {
-
+            playerController.BButtonRelease();
         }
 
     }
@@ -56,7 +57,7 @@ public class PlayerInputHandler : MonoBehaviour //this class is instantiated as 
         }
         if (ctx.canceled)
         {
-
+            playerController.CButtonRelease();
         }
 
     }
@@ -66,10 +67,5 @@ public class PlayerInputHandler : MonoBehaviour //this class is instantiated as 
         {
             playerController.Pause();
         }
-        if (ctx.canceled)
-        {
-
-        }
-
     }
 }

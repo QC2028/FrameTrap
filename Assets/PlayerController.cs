@@ -7,21 +7,25 @@ public class PlayerController : MonoBehaviour //this class recieves the inputs f
 {
     [SerializeField] private int playerIndex = 0; //this is what the inputhandler can see and attaches controllers based on this
     public PlayerActions actions;
-    Vector2 moveVector = Vector2.zero;
-    bool AButtonPressed = false;
-    bool BButtonPressed = false;
-    bool CButtonPressed = false;
-    int FrameCounter = 0;
+
+    public InputData newInput;
 
 
+    private void Awake()
+    {
+        newInput = new InputData(playerIndex);
+    }
 
     void FixedUpdate()
     {
-        FrameCounter++; //new frame
-        actions.InputAction(moveVector, AButtonPressed, BButtonPressed, CButtonPressed, FrameCounter, playerIndex); //send input action for this frame
-        AButtonPressed = false; //reset button press booleans
-        BButtonPressed = false;
-        CButtonPressed = false;
+        newInput.FrameCounter++; //new frame
+        actions.InputAction(newInput); //send input action for this frame
+        newInput.AButtonPressed = false; //reset button press and release booleans
+        newInput.AButtonReleased = false;
+        newInput.BButtonPressed = false;
+        newInput.BButtonReleased = false;
+        newInput.CButtonPressed = false;
+        newInput.CButtonReleased = false;
     }
 
     public int GetPlayerIndex() 
@@ -31,20 +35,41 @@ public class PlayerController : MonoBehaviour //this class recieves the inputs f
 
     public void SetMoveVector(Vector2 input) //input functions to be accessed by player input handler
     {
-        moveVector = input;        
+        newInput.movementVector = input;
     }
     public void AButtonPress()
     {
-        AButtonPressed = true;       
+        newInput.AButtonPressed = true; 
+        newInput.AButtonHeld = true; //start holding on press
     }
+    public void AButtonRelease()
+    {
+        newInput.AButtonReleased = true;
+        newInput.AButtonHeld = false; //stop holding on release
+    }
+
     public void BButtonPress()
     {
-        BButtonPressed = true;
+        newInput.BButtonPressed = true;
+        newInput.BButtonHeld = true;
     }
+    public void BButtonRelease()
+    {
+        newInput.BButtonReleased = true;
+        newInput.BButtonHeld = false;
+    }
+
     public void CButtonPress()
     {
-        CButtonPressed = true;
+        newInput.CButtonPressed = true;
+        newInput.CButtonHeld = true;
     }
+    public void CButtonRelease()
+    {
+        newInput.CButtonReleased = true;
+        newInput.CButtonHeld = false;
+    }
+
     public void Pause()
     {
         Debug.Log("pause button pressed");

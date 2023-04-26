@@ -7,25 +7,15 @@ using UnityEngine.InputSystem.Utilities;
 public class PlayerActions : MonoBehaviour //this class controls the players actions based on inputs that are passed in from the player controller
 {
     List<InputData> inputHistory; //new list of inputdata struct
+    InputData latestInput; //empty inputdata to hold latest input when recieved
 
-    Vector2 moveVector = Vector2.zero;
-    bool AButtonIsPressed = false;
-    bool BButtonIsPressed = false;
-    bool CButtonIsPressed = false;
+    Vector3 newVector = Vector3.zero; //used to move player
+    private bool isBusy = false; //used to check if player cannot do other actions because they are doing something else
 
+    [SerializeField] private float moveSpeed = 0.1f; //player movement multiplier
+    [SerializeField] private int inputReaderLength = 15; //how far back the inputs are held for special moves
+    [SerializeField] private int inputBufferLength = 5; //how far before a player stops being busy that the inputs are read
 
-
-    Vector3 newVector = Vector3.zero;
-    private bool isAttacking = false;
-
-    [SerializeField] private float moveSpeed = 0.1f;
-    [SerializeField] private int inputReaderLength = 15;
-
-
-    
-    
-    
-    
     
     private void Awake()
     {
@@ -36,67 +26,66 @@ public class PlayerActions : MonoBehaviour //this class controls the players act
     private void FixedUpdate()
     {
 
-        if(inputHistory.Count > inputReaderLength)
+        if(inputHistory.Count > inputReaderLength) 
         {
-            //if (!isAttacking) //if not attacking, move player in space (but can still read inputs if attacking)
-            //{
-            //    newVector = new Vector3(moveVector.x * moveSpeed, 0, 0);
-            //    transform.position += newVector;
-            //}
-            if (!isAttacking) //if not attacking, move player in space (but can still read inputs if attacking)
+            latestInput = inputHistory[inputHistory.Count - 1];
+
+            //MOVEMENT
+            if (!isBusy) //if not attacking, move player in space (but can still read inputs if attacking)
             {
-                newVector = new Vector3(inputHistory[inputHistory.Count - 1].movementVector.x * moveSpeed, 0, 0);
+                newVector = new Vector3(latestInput.movementVector.x * moveSpeed, 0, 0);
                 transform.position += newVector;
             }
 
-            if (inputHistory[inputHistory.Count - 1].AButtonPressed)
+            //A BUTTON
+            if (latestInput.AButtonPressed)
             {
-                Debug.Log("A Button Pressed");
+                
             }
-            if (inputHistory[inputHistory.Count - 1].BButtonPressed)
+            if (latestInput.AButtonHeld)
             {
-                Debug.Log("B Button Pressed");
+                
             }
-            if (inputHistory[inputHistory.Count - 1].CButtonPressed)
+            if (latestInput.AButtonReleased)
             {
-                Debug.Log("C Button Pressed");
+                
             }
+
+            //B BUTTON
+            if (latestInput.BButtonPressed)
+            {
+
+            }
+            if (latestInput.BButtonHeld)
+            {
+
+            }
+            if (latestInput.BButtonReleased)
+            {
+
+            }
+
+            //C BUTTON
+            if (latestInput.CButtonPressed)
+            {
+
+            }
+            if (latestInput.CButtonHeld)
+            {
+
+            }
+            if (latestInput.CButtonReleased)
+            {
+
+            }
+
+            //Debug.Log("index-" + latestInput.playerIndex + " frame-" + latestInput.FrameCounter + " vector-" + latestInput.movementVector + " APress-" + latestInput.AButtonPressed + " AHold-" + latestInput.AButtonHeld + " ARel-" + latestInput.AButtonReleased);
         }
-
-        //Debug.Log(inputHistory.Count);
-        //Debug.Log(inputHistory.Count + " " + inputHistory[inputHistory.Count - 1].playerIndex);
-        //Debug.Log("pi: " + inputHistory[inputHistory.Count - 1].playerIndex + " Frame: " + inputHistory[inputHistory.Count - 1].FrameCounter + ", Vector: " + inputHistory[inputHistory.Count - 1].movementVector + ", A: " + inputHistory[inputHistory.Count - 1].AButtonPressed + ", B: " + inputHistory[inputHistory.Count - 1].BButtonPressed + ", C: " + inputHistory[inputHistory.Count - 1].CButtonPressed);
     }
 
-    public void InputAction(Vector2 movementVector, bool AButtonPressed, bool BButtonPressed, bool CButtonPressed, int FrameCounter, int playerIndex) //pass in input data from player controller
+    public void InputAction(InputData input) //pass in input data from player controller
     {
-        InputData inputData = new InputData(); //create new inputdata struct and fill with passed in data
-        inputData.playerIndex = playerIndex;
-        inputData.movementVector = movementVector;
-        inputData.AButtonPressed = AButtonPressed;
-        inputData.BButtonPressed = BButtonPressed;
-        inputData.CButtonPressed = CButtonPressed;
-        inputData.FrameCounter = FrameCounter;
-        inputHistory.Add(inputData); //add this struct to the input history
-
-        //moveVector = movementVector; //set current movement
-        //AButtonIsPressed = AButtonPressed;
-        //BButtonIsPressed = BButtonPressed;
-        //CButtonIsPressed = CButtonPressed;
-    }
-
-    void inputAttack()
-    {
-
+        inputHistory.Add(input); //add this struct to the input history
     }
 }
 
-struct InputData // struct to hold actions for each frame
-{
-    public int playerIndex;
-    public Vector2 movementVector;
-    public bool AButtonPressed;
-    public bool BButtonPressed;
-    public bool CButtonPressed;
-    public int FrameCounter;
-}
