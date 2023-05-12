@@ -20,6 +20,8 @@ public struct InputData // struct to hold actions for each frame
     public bool CButtonHeld;
     public bool CButtonReleased;
 
+    public bool AnyButtonPressed;
+
     public InputData(int playerIndex)
     {
         this.playerIndex = playerIndex;
@@ -37,5 +39,7 @@ public struct InputData // struct to hold actions for each frame
         this.CButtonPressed = false;
         this.CButtonHeld = false;
         this.CButtonReleased = false;
+
+        this.AnyButtonPressed = false;
     }
 }

@@ -1,33 +1,110 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Threading;
+using TMPro;
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.InputSystem.Utilities;
 
 public class PlayerActions : MonoBehaviour //this class controls the players actions based on inputs that are passed in from the player controller
 {
-    List<InputData> inputHistory; //new list of inputdata struct
-    InputData latestInput; //empty inputdata to hold latest input when recieved
+    public int inputReaderLength = 15; //how far back the inputs are held for special moves
 
-    Vector3 newVector = Vector3.zero; //used to move player
-    private bool isBusy = false; //used to check if player cannot do other actions because they are doing something else
+    public float moveSpeed = 0.1f; //player movement multiplier
 
-    [SerializeField] private float moveSpeed = 0.1f; //player movement multiplier
-    [SerializeField] private int inputReaderLength = 15; //how far back the inputs are held for special moves
-    [SerializeField] private int inputBufferLength = 5; //how far before a player stops being busy that the inputs are read
+    public int HitStunDuration;
+    public int HitStunFreezeDuration;
+    public float HitStunKnockback;
 
+    public int BlockStunDuration;
+    public int BlockStunFreezeDuration;
+    public float BlockStunKnockback;
+
+    public int playerHealth = 10;
+
+    public TextMeshProUGUI playerHealthUI;
+
+
+
+    public List<InputData> inputHistory; //new list of inputdata struct
+    List<InputData> inputReader;
+    public InputData latestInput; //empty inputdata to hold latest input when recieved
+    public bool isBusy = false; //used to check if player cannot do other actions because they are doing something else
+    public bool isBlocking;
+    public bool isHit;
     public Animator animator;
 
+    public PlayerActions enemyPlayer;
+
+    //SPRITES
+    public SpriteRenderer SpriteRenderer; // sprite renderer for player
+    public Sprite sprite5AStartup;
+    public Sprite sprite5AActive;
+    public Sprite sprite5ARecovery;
+
+    public Sprite sprite5BStartup;
+    public Sprite sprite5BActive;
+    public Sprite sprite5BRecovery;
+
+    public Sprite sprite5CStartup;
+    public Sprite sprite5CActive;
+    public Sprite sprite5CRecovery;
+
+    public Sprite sprite236XStartup;
+    public Sprite sprite236XActive;
+    public Sprite sprite236XRecovery;
+
+    public Sprite sprite214XStartup;
+    public Sprite sprite214XActive;
+    public Sprite sprite214XRecovery;
+
+    public Sprite spriteBlocking;
+    public Sprite spriteHitFreeze;
+    public Sprite spriteHitStun;
+    public Sprite spriteIdle;
+    public Sprite spriteWalk1;
+    public Sprite spriteWalk2;
+    public Sprite spriteWalk3;
+
+    //PLAYER EFFECTS
+    public GameObject hitEffects;
+    public GameObject blockEffects;
+    public GameObject healEffects;
+
     //HITBOXES
-    public GameObject attack5A;
+    public GameObject hitbox5A;
+    public GameObject hitbox5B;
+    public GameObject hitbox5C;
+    public GameObject hitbox236X;
+    public GameObject hitbox214X;
 
 
+    //STATES
+    public PlayerBaseState currentState;
+    public PlayerIdleState IdleState = new PlayerIdleState();
+    public PlayerWalkState WalkState = new PlayerWalkState(); 
+    public PlayerAttackState AttackState = new PlayerAttackState();
+    public PlayerBlockState BlockState = new PlayerBlockState();
+    public PlayerHitState HitState = new PlayerHitState();
 
     private void Awake()
     {
         inputHistory = new List<InputData>(); //new list of inputdata struct
+        inputReader = new List<InputData>();
     }
 
+
+    private void Start()
+    {
+        currentState = IdleState;
+
+        currentState.EnterState(this);
+    }
+
+    private void Update()
+    {
+        playerHealthUI.text = playerHealth.ToString();
+    }
 
     private void FixedUpdate()
     {
@@ -36,63 +113,9 @@ public class PlayerActions : MonoBehaviour //this class controls the players act
         {
             latestInput = inputHistory[inputHistory.Count - 1];
 
-            //MOVEMENT
-            if (!isBusy) //if not attacking, move player in space (but can still read inputs if attacking)
-            {
-                newVector = new Vector3(latestInput.movementVector.x * moveSpeed, 0, 0);
-                transform.position += newVector;
-                if (newVector.x != 0 || newVector.y != 0)
-                {
-                    animator.SetBool("isWalking", true);
-                } else
-                {
-                    animator.SetBool("isWalking", false);
-                }
-            }
 
-            //A BUTTON
-            if (latestInput.AButtonPressed)
-            {
 
-            }
-            if (latestInput.AButtonHeld)
-            {
-                
-            }
-            if (latestInput.AButtonReleased)
-            {
-                
-            }
-
-            //B BUTTON
-            if (latestInput.BButtonPressed)
-            {
-
-            }
-            if (latestInput.BButtonHeld)
-            {
-
-            }
-            if (latestInput.BButtonReleased)
-            {
-
-            }
-
-            //C BUTTON
-            if (latestInput.CButtonPressed)
-            {
-
-            }
-            if (latestInput.CButtonHeld)
-            {
-
-            }
-            if (latestInput.CButtonReleased)
-            {
-
-            }
-
-            //Debug.Log("index-" + latestInput.playerIndex + " frame-" + latestInput.FrameCounter + " vector-" + latestInput.movementVector + " APress-" + latestInput.AButtonPressed + " AHold-" + latestInput.AButtonHeld + " ARel-" + latestInput.AButtonReleased);
+            currentState.UpdateState(this);
         }
     }
 
@@ -101,8 +124,16 @@ public class PlayerActions : MonoBehaviour //this class controls the players act
         inputHistory.Add(input); //add this struct to the input history
     }
 
+    void OnTriggerEnter2D(Collider2D collider)
+    {
+        currentState.OnTriggerEnter2D(this, collider);
+    }
 
-
+    public void SwitchState(PlayerBaseState state)
+    {
+        currentState = state;
+        state.EnterState(this);
+    }
 
 }
 

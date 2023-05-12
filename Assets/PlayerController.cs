@@ -19,6 +19,10 @@ public class PlayerController : MonoBehaviour //this class recieves the inputs f
     void FixedUpdate()
     {
         newInput.FrameCounter++; //new frame
+        if (newInput.AButtonPressed || newInput.BButtonPressed || newInput.CButtonPressed)
+        {
+            newInput.AnyButtonPressed = true;
+        }
         actions.InputAction(newInput); //send input action for this frame
         newInput.AButtonPressed = false; //reset button press and release booleans
         newInput.AButtonReleased = false;
@@ -26,6 +30,7 @@ public class PlayerController : MonoBehaviour //this class recieves the inputs f
         newInput.BButtonReleased = false;
         newInput.CButtonPressed = false;
         newInput.CButtonReleased = false;
+        newInput.AnyButtonPressed = false;
     }
 
     public int GetPlayerIndex() 
